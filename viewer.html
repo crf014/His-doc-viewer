@@ -6,72 +6,72 @@
   <title>RO2 Family History Document Viewer</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
+      font-family: Arial, sans-serif;
       background: #f9f9f9;
     }
     .top-bar {
       background: #ffffff;
-      padding: 10px 16px;
       border-bottom: 1px solid #ddd;
+      padding: 10px 16px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      position: relative;
+      z-index: 10;
     }
-    button {
+    #return-btn {
       background: #3367d6;
       color: #fff;
       border: none;
-      padding: 8px 14px;
-      border-radius: 5px;
+      padding: 6px 12px;
+      border-radius: 4px;
       cursor: pointer;
       font-size: 14px;
     }
-    button:hover {
-      background: #2554b0;
+    #return-btn:hover {
+      background: #2953ad;
     }
-    iframe {
+    #doc-frame {
       width: 100%;
       height: calc(100vh - 50px);
       border: none;
+      display: block;
     }
   </style>
 </head>
 <body>
   <div class="top-bar">
     <button id="return-btn">← Return</button>
-    <span id="doc-title">Family History Document Viewer</span>
+    <span>RO2 Family History Document Viewer</span>
   </div>
 
   <iframe id="doc-frame"></iframe>
 
   <script>
-    // Get parameters from the URL
     const params = new URLSearchParams(window.location.search);
     const docId = params.get('id');
     const from = params.get('from');
 
-    // If a Google Doc ID is provided, embed it in the iframe
+    // load the doc
     if (docId) {
       document.getElementById('doc-frame').src =
         `https://docs.google.com/document/d/${docId}/edit?usp=sharing`;
     } else {
-      document.body.innerHTML = "<p style='padding:20px;'>❌ Error: no document ID provided in the URL.</p>";
+      document.body.innerHTML = "<p style='padding:20px;'>❌ No document ID provided.</p>";
     }
 
-    // Configure the Return button logic
-    const returnBtn = document.getElementById('return-btn');
+    // set return button
+    const btn = document.getElementById('return-btn');
     if (from === 'ro2') {
-      returnBtn.onclick = () =>
-        (window.location.href = 'https://sites.google.com/view/ro2familyhistory/home?authuser=0');
-      returnBtn.textContent = '← Return to RO2 Family History';
-    } else if (from === 'training') {
-      returnBtn.onclick = () =>
-        (window.location.href = 'https://training.yoursite.com');
-      returnBtn.textContent = '← Return to Training Site';
+      btn.textContent = "← Return to RO2 Family History";
+      btn.onclick = () => {
+        window.location.href = "https://sites.google.com/view/ro2familyhistory/home?authuser=0";
+      };
     } else {
-      returnBtn.onclick = () => window.history.back();
-      returnBtn.textContent = '← Return';
+      // fallback
+      btn.textContent = "← Return";
+      btn.onclick = () => window.history.back();
     }
   </script>
 </body>
