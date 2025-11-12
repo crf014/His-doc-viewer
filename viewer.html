@@ -49,30 +49,42 @@
   <iframe id="doc-frame"></iframe>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const docId = params.get('id');
-    const from = params.get('from');
+  const params    = new URLSearchParams(window.location.search);
+  const docId     = params.get('id');
+  const returnUrl = params.get('return'); // full URL, URL-encoded
+  const from      = params.get('from');
 
-    // load the doc
-    if (docId) {
-      document.getElementById('doc-frame').src =
-        `https://docs.google.com/document/d/${docId}/preview`;
-    } else {
-      document.body.innerHTML = "<p style='padding:20px;'>❌ No document ID provided.</p>";
-    }
+  // load doc in view-only
+  if (docId) {
+    document.getElementById('doc-frame').src =
+      `https://docs.google.com/document/d/${docId}/preview`;
+  } else {
+    document.body.innerHTML = "<p style='padding:20px;'>❌ No document ID provided.</p>";
+  }
 
-    // set return button
-    const btn = document.getElementById('return-btn');
-    if (from === 'ro2') {
-      btn.textContent = "← Return to RO2 Family History";
-      btn.onclick = () => {
-        window.location.href = "https://sites.google.com/view/ro2familyhistory/home?authuser=0";
-      };
+  const btn = document.getElementById('return-btn');
+  const goHome = (url) => {
+    if (window.history.length > 1) {
+      window.history.back();
     } else {
-      // fallback
-      btn.textContent = "← Return";
-      btn.onclick = () => window.history.back();
+      window.location.href = url;
     }
-  </script>
+  };
+
+  if (returnUrl) {
+    btn.textContent = "← Return";
+    btn.onclick = () => goHome(returnUrl);
+  } else if (from === 'ro2') {
+    btn.textContent = "← Return to RO2 Family History";
+    btn.onclick = () => goHome("https://sites.google.com/view/ro2familyhistory/home?authuser=0");
+  } else if (from === 'roots') {
+    btn.textContent = "← Return to Roots Unlocked";
+    btn.onclick = () => goHome("https://sites.google.com/view/rootsunlocked");
+  } else {
+    btn.textContent = "← Return";
+    btn.onclick = () => window.history.back();
+  }
+</script>
+
 </body>
 </html>
