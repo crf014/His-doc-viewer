@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background-color: #4285f4;
+            color: white;
+            padding: 15px 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .return-button {
+            background-color: white;
+            color: #4285f4;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.1s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .return-button:hover {
+            background-color: #f1f3f4;
+            transform: translateY(-1px);
+        }
+
+        .return-button:active {
+            transform: translateY(0);
+        }
+
+        .viewer-container {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .iframe-wrapper {
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 40px;
+            color: #d93025;
+            font-size: 16px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #5f6368;
+            font-size: 16px;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .viewer-container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Document Viewer</h1>
+        <button class="return-button" id="returnBtn" onclick="goBack()">
+            ← Return to Site
+        </button>
+    </div>
+
+    <div class="viewer-container">
+        <div class="iframe-wrapper" id="viewerWrapper">
+            <div class="loading" id="loading">Loading document...</div>
+        </div>
+    </div>
+
+    <script>
+        // Get URL parameters
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Get document ID and return URL from parameters
+        const docId = getUrlParameter('docId');
+        const returnUrl = getUrlParameter('returnUrl');
+
+        // Function to go back to the calling site
+        function goBack() {
+            if (returnUrl) {
+                window.location.href = decodeURIComponent(returnUrl);
+            } else {
+                // If no return URL is provided, try browser back
+                if (window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    alert('No return URL specified');
+                }
+            }
+        }
+
+        // Function to load the document
+        function loadDocument() {
+            const wrapper = document.getElementById('viewerWrapper');
+            
+            if (!docId) {
+                wrapper.innerHTML = '<div class="error-message">Error: No document ID provided.<br><br>Please use the format:<br>viewer.html?docId=YOUR_DOC_ID&returnUrl=YOUR_SITE_URL</div>';
+                return;
+            }
+
+            // Create the Google Docs preview URL
+            // Format: https://docs.google.com/document/d/DOCUMENT_ID/preview
+            const previewUrl = `https://docs.google.com/document/d/${docId}/preview`;
+
+            // Create iframe element
+            const iframe = document.createElement('iframe');
+            iframe.src = previewUrl;
+            iframe.setAttribute('allowfullscreen', 'true');
+            
+            // Handle iframe load
+            iframe.onload = function() {
+                const loading = document.getElementById('loading');
+                if (loading) {
+                    loading.remove();
+                }
+            };
+
+            // Handle iframe errors
+            iframe.onerror = function() {
+                wrapper.innerHTML = '<div class="error-message">Error loading document. Please check if the document ID is correct and the document is publicly accessible.</div>';
+            };
+
+            // Clear loading message and add iframe
+            wrapper.innerHTML = '';
+            wrapper.appendChild(iframe);
+        }
+
+        // Load document when page loads
+        window.addEventListener('DOMContentLoaded', loadDocument);
+
+        // Handle keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            // ESC key to go back
+            if (event.key === 'Escape') {
+                goBack();
+            }
+        });
+    </script>
+</body>
+</html>
